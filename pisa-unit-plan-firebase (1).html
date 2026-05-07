@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โครงสร้างหน่วยการเรียนรู้บูรณาการ PISA</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<style>
+/* ════════════════════════════════════════════════════
+   DESIGN SYSTEM — Teal + Violet + สีสันสดใส
+════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal-900:#064E3B; --teal-700:#047857; --teal-500:#10B981;
+  --teal-400:#34D399; --teal-100:#D1FAE5; --teal-50:#ECFDF5;
+  --violet-700:#6D28D9; --violet-500:#8B5CF6; --violet-100:#EDE9FE; --violet-50:#F5F3FF;
+  --amber-600:#D97706; --amber-400:#FBBF24; --amber-100:#FEF3C7; --amber-50:#FFFBEB;
+  --rose-600:#E11D48; --rose-100:#FFE4E6; --rose-50:#FFF1F2;
+  --sky-600:#0284C7; --sky-400:#38BDF8; --sky-100:#E0F2FE; --sky-50:#F0F9FF;
+  --gray-900:#111827; --gray-800:#1F2937; --gray-700:#374151; --gray-600:#4B5563;
+  --gray-500:#6B7280; --gray-400:#9CA3AF; --gray-300:#D1D5DB;
+  --gray-200:#E5E7EB; --gray-100:#F3F4F6; --gray-50:#F9FAFB; --white:#FFFFFF;
+  --font:'Sarabun','Noto Sans Thai',sans-serif;
+  --r-sm:6px; --r:12px; --r-lg:16px; --r-xl:24px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08); --shadow:0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:0 20px 40px rgba(0,0,0,.12);
+}
+
+html { scroll-behavior:smooth; }
+body {
+  font-family:var(--font); font-size:15px; line-height:1.6;
+  color:var(--gray-800); min-height:100vh;
+  background: linear-gradient(135deg, #ECFDF5 0%, #EDE9FE 50%, #F0F9FF 100%);
+  background-attachment:fixed;
+}
+
+.app { max-width:1280px; margin:0 auto; padding:0 20px 60px; }
+
+/* ── HERO ── */
+.hero {
+  background:linear-gradient(135deg, var(--teal-700) 0%, var(--violet-700) 100%);
+  border-radius:0 0 var(--r-xl) var(--r-xl);
+  padding:32px 40px 28px; margin:0 -20px 28px;
+  position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:220px; height:220px; border-radius:50%;
+  background:rgba(255,255,255,.07);
+}
+.hero::after {
+  content:''; position:absolute; bottom:-60px; left:30%;
+  width:300px; height:300px; border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.hero-eyebrow {
+  font-size:11px; font-weight:700; letter-spacing:2px;
+  text-transform:uppercase; color:var(--teal-400); margin-bottom:8px;
+}
+.hero h1 { font-size:24px; font-weight:700; color:#fff; line-height:1.3; margin-bottom:5px; }
+.hero p  { font-size:13.5px; color:rgba(255,255,255,.75); }
+
+.status-pill {
+  display:inline-flex; align-items:center; gap:7px;
+  background:rgba(255,255,255,.15); backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.25); border-radius:30px;
+  padding:5px 14px; font-size:12px; color:#fff; margin-top:14px;
+}
+.dot { width:7px; height:7px; border-radius:50%; background:var(--teal-400); animation:pulse 2s infinite; }
+.dot.warn { background:var(--amber-400); }
+.dot.err  { background:#F87171; animation:none; }
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.82)}}
+
+/* ── TABS ── */
+.tabs { display:flex; gap:8px; margin-bottom:22px; }
+.tab-btn {
+  flex:1; padding:12px 16px; border-radius:var(--r);
+  font-family:var(--font); font-size:14px; font-weight:500;
+  border:1.5px solid var(--gray-200); background:var(--white); color:var(--gray-500);
+  cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+}
+.tab-btn:hover { border-color:var(--teal-400); color:var(--teal-700); }
+.tab-btn.active {
+  background:linear-gradient(135deg,var(--teal-500),var(--violet-500));
+  border-color:transparent; color:#fff;
+  box-shadow:0 4px 12px rgba(16,185,129,.35);
+}
+
+/* ── BUTTONS ── */
+.action-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:18px; }
+.spacer { flex:1; }
+.btn {
+  font-family:var(--font); font-size:13.5px; font-weight:500;
+  padding:9px 18px; border-radius:var(--r); border:none; cursor:pointer;
+  display:inline-flex; align-items:center; gap:7px;
+  transition:all .2s; white-space:nowrap;
+}
+.btn:active { transform:scale(.97); }
+.btn-teal {
+  background:linear-gradient(135deg,var(--teal-500),#059669); color:#fff;
+  box-shadow:0 2px 8px rgba(16,185,129,.35);
+}
+.btn-teal:hover { box-shadow:0 4px 16px rgba(16,185,129,.45); transform:translateY(-1px); }
+.btn-sky {
+  background:linear-gradient(135deg,var(--sky-400),var(--sky-600)); color:#fff;
+  box-shadow:0 2px 8px rgba(2,132,199,.3);
+}
+.btn-sky:hover { box-shadow:0 4px 16px rgba(2,132,199,.4); transform:translateY(-1px); }
+.btn-rose { background:var(--rose-50); color:var(--rose-600); border:1.5px solid var(--rose-100); }
+.btn-rose:hover { background:var(--rose-100); }
+.btn-ghost { background:var(--white); color:var(--gray-600); border:1.5px solid var(--gray-200); }
+.btn-ghost:hover { background:var(--gray-50); }
+
+/* ── TABLE CARD ── */
+.table-card {
+  background:var(--white); border-radius:var(--r-lg);
+  box-shadow:var(--shadow); overflow:hidden; border:1px solid var(--gray-100);
+}
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:980px; }
+
+thead tr {
+  background:linear-gradient(135deg,var(--teal-50),var(--violet-50));
+  border-bottom:2px solid var(--gray-100);
+}
+thead th {
+  padding:13px 11px; font-size:11.5px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.7px;
+  color:var(--gray-500); text-align:left; white-space:nowrap;
+}
+thead th.center { text-align:center; }
+
+tbody tr { border-bottom:1px solid var(--gray-100); transition:background .15s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:var(--teal-50); }
+
+/* แถวที่บันทึกแล้วจะมีแถบสีเขียวซ้าย */
+tbody tr.saved { background:linear-gradient(90deg,rgba(16,185,129,.06),transparent); }
+tbody tr.saved:hover { background:linear-gradient(90deg,rgba(16,185,129,.12),var(--teal-50)); }
+
+tbody td { padding:6px 8px; vertical-align:top; }
+
+.row-badge {
+  width:28px; height:28px; border-radius:50%;
+  background:linear-gradient(135deg,var(--teal-500),var(--violet-500));
+  color:#fff; font-size:12px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; margin:0 auto;
+}
+.row-badge.saved { background:linear-gradient(135deg,var(--teal-400),var(--teal-600)); }
+
+/* ── INPUTS ── */
+input[type=text],input[type=number],textarea {
+  width:100%; padding:6px 9px; font-size:13px; font-family:var(--font);
+  border:1.5px solid var(--gray-200); border-radius:var(--r-sm);
+  background:var(--white); color:var(--gray-800); outline:none;
+  transition:all .2s; resize:vertical;
+}
+input[type=text]:focus,input[type=number]:focus,textarea:focus {
+  border-color:var(--teal-500); box-shadow:0 0 0 3px rgba(16,185,129,.12);
+  background:var(--teal-50);
+}
+input[type=number] { text-align:center; }
+textarea { min-height:56px; line-height:1.5; }
+
+/* ── SAVE-ROW BUTTON ── */
+.save-row-btn {
+  font-family:var(--font); font-size:12px; font-weight:600;
+  padding:6px 11px; border-radius:var(--r-sm); border:none; cursor:pointer;
+  background:linear-gradient(135deg,var(--teal-500),#059669); color:#fff;
+  box-shadow:0 2px 6px rgba(16,185,129,.3); transition:all .2s; white-space:nowrap;
+}
+.save-row-btn:hover { transform:translateY(-1px); box-shadow:0 4px 10px rgba(16,185,129,.4); }
+.save-row-btn:active { transform:scale(.97); }
+/* สถานะ "บันทึกแล้ว" */
+.save-row-btn.done {
+  background:linear-gradient(135deg,var(--gray-300),var(--gray-400));
+  box-shadow:none;
+}
+
+.del-btn {
+  background:none; border:none; cursor:pointer;
+  color:var(--gray-400); font-size:16px; padding:3px 6px;
+  border-radius:var(--r-sm); transition:all .2s; line-height:1;
+}
+.del-btn:hover { background:var(--rose-100); color:var(--rose-600); }
+
+/* ── TFOOT ── */
+tfoot tr { background:linear-gradient(135deg,var(--teal-50),var(--violet-50)); border-top:2px solid var(--gray-100); }
+tfoot td { padding:10px 11px; font-weight:600; font-size:13.5px; }
+
+/* ── STAT CARDS ── */
+.stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:14px; margin-bottom:24px; }
+.stat-card {
+  border-radius:var(--r-lg); padding:18px 20px;
+  position:relative; overflow:hidden;
+}
+.stat-card::after {
+  content:''; position:absolute; bottom:-20px; right:-20px;
+  width:80px; height:80px; border-radius:50%;
+  background:rgba(255,255,255,.15);
+}
+.stat-teal   { background:linear-gradient(135deg,var(--teal-500),#059669); color:#fff; }
+.stat-violet { background:linear-gradient(135deg,var(--violet-500),var(--violet-700)); color:#fff; }
+.stat-amber  { background:linear-gradient(135deg,var(--amber-400),var(--amber-600)); color:#fff; }
+.stat-sky    { background:linear-gradient(135deg,var(--sky-400),var(--sky-600)); color:#fff; }
+.stat-rose   { background:linear-gradient(135deg,#FB7185,var(--rose-600)); color:#fff; }
+.stat-label { font-size:11.5px; font-weight:700; opacity:.8; margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+.stat-value { font-size:28px; font-weight:700; line-height:1; margin-bottom:4px; }
+.stat-sub   { font-size:12px; opacity:.75; }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size:12px; font-weight:700; color:var(--gray-500);
+  text-transform:uppercase; letter-spacing:1px;
+  margin:22px 0 12px; display:flex; align-items:center; gap:10px;
+}
+.section-label::after { content:''; flex:1; height:2px; background:var(--gray-100); border-radius:1px; }
+
+.empty { text-align:center; padding:48px 16px; color:var(--gray-400); font-size:14px; }
+.empty-icon { font-size:36px; margin-bottom:10px; opacity:.5; }
+
+/* ── SUBJECT CARDS ── */
+.subject-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(195px,1fr)); gap:12px; margin-top:14px; }
+.subject-card {
+  background:var(--white); border-radius:var(--r); padding:14px 16px;
+  border:1px solid var(--gray-100); box-shadow:var(--shadow-sm);
+  transition:transform .2s, box-shadow .2s;
+}
+.subject-card:hover { transform:translateY(-2px); box-shadow:var(--shadow); }
+.subject-card h4 { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:4px; }
+.subject-card p { font-size:12.5px; color:var(--gray-500); }
+
+/* ── TOAST ── */
+.toast-wrap { position:fixed; bottom:24px; right:24px; display:flex; flex-direction:column; gap:8px; z-index:999; }
+.toast {
+  padding:10px 18px; border-radius:var(--r); font-size:13px; font-weight:500;
+  box-shadow:var(--shadow-lg); display:flex; align-items:center; gap:8px; color:#fff;
+  animation:tIn .25s ease, tOut .3s ease 2.7s forwards;
+}
+.toast.ok  { background:linear-gradient(135deg,var(--teal-700),var(--teal-500)); }
+.toast.err { background:linear-gradient(135deg,#B91C1C,var(--rose-600)); }
+@keyframes tIn  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes tOut { from{opacity:1} to{opacity:0;transform:translateY(6px)} }
+
+/* db table */
+.db-table td { padding:10px 11px; font-size:13px; vertical-align:top; line-height:1.6; }
+.db-table tr:hover td { background:var(--teal-50); }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ HERO ══ -->
+<div class="hero">
+  <div class="hero-eyebrow">ระบบบันทึกข้อมูลร่วมกัน · Real-time Sync</div>
+  <h1>โครงสร้างหน่วยการเรียนรู้บูรณาการ 🎓</h1>
+  <p>เสริมสร้างสมรรถนะความฉลาดรู้ของผู้เรียน ตามแนวทางการประเมินระดับนานาชาติ PISA</p>
+  <div class="status-pill">
+    <div class="dot warn" id="sdot"></div>
+    <span id="smsg">กำลังเชื่อมต่อ...</span>
+  </div>
+</div>
+
+<!-- ══ TABS ══ -->
+<div class="tabs">
+  <button class="tab-btn active" id="tab-form"      onclick="switchTab('form')">📝 กรอกข้อมูล</button>
+  <button class="tab-btn"        id="tab-dash" onclick="switchTab('dash')">📊 Dashboard</button>
+</div>
+
+<!-- ════════════ PAGE: FORM ════════════ -->
+<div id="page-form">
+  <div class="action-bar">
+    <button class="btn btn-teal" onclick="addRow()">➕ เพิ่มแถว</button>
+    <button class="btn btn-sky"  onclick="dlWord()">📄 ดาวน์โหลด Word</button>
+    <button class="btn btn-rose" onclick="clearAll()">🗑 ล้างทั้งหมด</button>
+    <div class="spacer"></div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:42px" class="center">#</th>
+            <th style="min-width:110px">รายวิชา</th>
+            <th style="min-width:100px">ครูผู้สอน</th>
+            <th style="min-width:110px">มาตรฐาน</th>
+            <th style="min-width:115px">ตัวชี้วัด</th>
+            <th style="min-width:160px">สาระสำคัญ/ความคิดรวบยอด</th>
+            <th style="min-width:115px">เรื่อง</th>
+            <th style="width:76px"  class="center">เวลา (ชม.)</th>
+            <th style="width:88px"  class="center">น้ำหนัก (คะแนน)</th>
+            <th style="width:82px"  class="center">บันทึก</th>
+            <th style="width:34px"></th>
+          </tr>
+        </thead>
+        <tbody id="fbody">
+          <tr><td colspan="11" class="empty">
+            <div class="empty-icon">📋</div>กด "เพิ่มแถว" เพื่อเริ่มกรอกข้อมูล
+          </td></tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="7" style="text-align:right;color:var(--gray-500);font-size:13px;">รวมทั้งหมด</td>
+            <td style="text-align:center;color:var(--teal-700)" id="th">0</td>
+            <td style="text-align:center;color:var(--violet-700)" id="ts">0</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--gray-400);margin-top:10px;text-align:center;">
+    พัฒนาระบบโดย ศน.เต็มสุข กฤตตภัคโภคิน ศึกษานิเทศก์ &nbsp;·&nbsp; สำนักงานเขตพื้นที่การศึกษาประถมศึกษาเชียงใหม่ เขต 2
+  </p>
+</div>
+
+<!-- ════════════ PAGE: DASHBOARD ════════════ -->
+<div id="page-dash" style="display:none">
+  <div class="action-bar">
+    <button class="btn btn-sky"   onclick="dlWord()">📄 ดาวน์โหลด Word</button>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost" onclick="renderDash()">↻ รีเฟรช</button>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card stat-teal">
+      <div class="stat-label">รายการทั้งหมด</div>
+      <div class="stat-value" id="sc">0</div>
+      <div class="stat-sub">รายการที่บันทึกแล้ว</div>
+    </div>
+    <div class="stat-card stat-violet">
+      <div class="stat-label">เวลารวม</div>
+      <div class="stat-value" id="sh">0</div>
+      <div class="stat-sub">ชั่วโมง</div>
+    </div>
+    <div class="stat-card stat-amber">
+      <div class="stat-label">คะแนนรวม</div>
+      <div class="stat-value" id="ss">0</div>
+      <div class="stat-sub">น้ำหนักคะแนน</div>
+    </div>
+    <div class="stat-card stat-sky">
+      <div class="stat-label">ครูผู้สอน</div>
+      <div class="stat-value" id="st">0</div>
+      <div class="stat-sub">คน</div>
+    </div>
+    <div class="stat-card stat-rose">
+      <div class="stat-label">รายวิชา</div>
+      <div class="stat-value" id="sv">0</div>
+      <div class="stat-sub">วิชา</div>
+    </div>
+  </div>
+
+  <div class="section-label">ข้อมูลทั้งหมดที่บันทึกแล้ว</div>
+  <div class="table-card">
+    <div class="table-wrap">
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th style="width:42px" class="center">#</th>
+            <th>รายวิชา</th><th>ครูผู้สอน</th><th>มาตรฐาน</th>
+            <th>ตัวชี้วัด</th><th>สาระสำคัญ/ความคิดรวบยอด</th>
+            <th>เรื่อง</th>
+            <th class="center">เวลา (ชม.)</th>
+            <th class="center">น้ำหนัก (คะแนน)</th>
+          </tr>
+        </thead>
+        <tbody id="dbody">
+          <tr><td colspan="9" class="empty"><div class="empty-icon">📊</div>ยังไม่มีข้อมูล</td></tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="7" style="text-align:right;color:var(--gray-500);font-size:13px;">รวม</td>
+            <td style="text-align:center;color:var(--teal-700)" id="dh">—</td>
+            <td style="text-align:center;color:var(--violet-700)" id="ds">—</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div id="subj-sec" style="display:none">
+    <div class="section-label">สรุปรายวิชา</div>
+    <div class="subject-grid" id="subj-grid"></div>
+  </div>
+</div>
+
+</div><!-- /.app -->
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   Firebase Config — ฝังค่าไว้ตายตัว ไม่ต้องตั้งค่าเพิ่ม
+══════════════════════════════════════════════════════ */
+const FB_CFG = {
+  apiKey:            "AIzaSyACr5NRbqmNPziG1gWPAm66CdAGxfpWFlg",
+  authDomain:        "pisa-unit-plan.firebaseapp.com",
+  databaseURL:       "https://pisa-unit-plan-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "pisa-unit-plan",
+  storageBucket:     "pisa-unit-plan.firebasestorage.app",
+  messagingSenderId: "700606091232",
+  appId:             "1:700606091232:web:04bf5c090aaee2302da585"
+};
+
+const COLS = [
+  {key:'subject',   label:'รายวิชา',                  multi:false},
+  {key:'teacher',   label:'ครูผู้สอน',                multi:false},
+  {key:'standard',  label:'มาตรฐาน',                  multi:true},
+  {key:'indicator', label:'ตัวชี้วัด',                multi:true},
+  {key:'concept',   label:'สาระสำคัญ/ความคิดรวบยอด',  multi:true},
+  {key:'topic',     label:'เรื่อง',                   multi:false},
+  {key:'hours',     label:'เวลา',   type:'number'},
+  {key:'score',     label:'คะแนน',  type:'number'},
+];
+
+/* ── State ──
+   localRows = แถวที่กำลังกรอกในเครื่องนี้
+   saved     = ข้อมูลทั้งหมดจาก Firebase (object keyed by rowId)
+   
+   หัวใจของการแก้ปัญหา "ข้อมูลทับกัน":
+   แต่ละแถวมี path ใน Firebase เป็น /pisa_rows/{rowId}
+   เมื่อคนที่ 2 บันทึกแถวของตัวเอง ระบบจะ write ที่ path ของตัวเองเท่านั้น
+   path ของคนที่ 1 ไม่ถูกแตะเลย ──────────────────────── */
+let localRows = [];
+let saved     = {};
+let dbRef     = null;
+let isDB      = false;
+
+function uid()   { return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function blank() { return {id:uid(),subject:'',teacher:'',standard:'',indicator:'',concept:'',topic:'',hours:'',score:'',at:null}; }
+function fmt(n)  { const v=parseFloat(n)||0; return v%1===0?String(v):v.toFixed(1); }
+function sum(a,k){ return a.reduce((s,r)=>s+(parseFloat(r[k])||0),0); }
+function esc(s)  { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ── TOAST ── */
+function toast(msg, type='ok') {
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.textContent=(type==='ok'?'✅ ':'❌ ')+msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
+}
+
+/* ══════════════════════════════════════════════════════
+   FIREBASE INIT + LISTENER
+
+   ใช้ .on('value') ฟังข้อมูล real-time จาก /pisa_rows
+   เมื่อใครก็ตามบันทึกแถวของตัวเอง Firebase จะส่ง snapshot
+   ของ /pisa_rows ทั้งหมดมาที่นี่ เราก็แค่อัปเดต saved{}
+   โดยไม่ยุ่งกับ localRows ของเครื่องนี้
+══════════════════════════════════════════════════════ */
+function initFB() {
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+    const db = firebase.database();
+    dbRef = db.ref('pisa_rows');
+    isDB  = true;
+
+    dbRef.on('value', snap => {
+      saved = snap.val() || {};
+      syncLocalFromSaved(); // นำแถวจาก Firebase มาแสดงในตาราง
+      renderForm();
+      updateTotals();
+      if (document.getElementById('page-dash').style.display !== 'none') renderDash();
+      setStatus('เชื่อมต่อแล้ว — บันทึกทีละแถว ข้อมูลไม่ทับกัน ✓','ok');
+    }, e => setStatus('Firebase error: '+e.message,'err'));
+
+  } catch(e) {
+    setStatus('เชื่อมต่อไม่ได้: '+e.message,'err');
+  }
+}
+
+/* นำแถวจาก saved ที่ยังไม่มีใน localRows มาแสดง
+   (แถวที่บันทึกโดยเครื่องอื่น) */
+function syncLocalFromSaved() {
+  const ids = new Set(localRows.map(r=>r.id));
+  Object.entries(saved).forEach(([id,data]) => {
+    if (!ids.has(id)) {
+      localRows.push({...data});
+      ids.add(id);
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   ROW-LEVEL SAVE — หัวใจของการแก้ปัญหา
+
+   แทนที่จะบันทึกทั้ง array → dbRef.set(allRows)
+   เราบันทึกเฉพาะแถวนั้น → dbRef.child(rowId).set(rowData)
+   
+   Firebase path: /pisa_rows/abc123 (rowId)
+   การเขียนที่ path นี้ไม่กระทบ path อื่นเลย
+   เหมือน Google Docs ที่แต่ละคนแก้ paragraph ของตัวเอง
+══════════════════════════════════════════════════════ */
+async function saveRow(rowId) {
+  collectRow(rowId);
+  const row = localRows.find(r=>r.id===rowId);
+  if (!row) return;
+
+  const btn = document.getElementById('sb-'+rowId);
+  if (btn) { btn.textContent='⏳'; btn.disabled=true; }
+
+  const data = {...row, at: Date.now()};
+
+  if (isDB && dbRef) {
+    try {
+      await dbRef.child(rowId).set(data);  // เขียนเฉพาะ path ของแถวนี้
+      row.at = data.at;
+      updateRowUI(rowId, true);
+      toast(`บันทึก "${row.subject||row.topic||'แถว'}" เรียบร้อย`);
+    } catch(e) {
+      toast('บันทึกไม่สำเร็จ: '+e.message,'err');
+    }
+  }
+
+  if (btn) { btn.textContent='💾 บันทึก'; btn.disabled=false; }
+}
+
+/* ── อ่านค่าจาก input/textarea ใน DOM → row object ── */
+function collectRow(rowId) {
+  const row=localRows.find(r=>r.id===rowId);
+  const tr=document.getElementById('tr-'+rowId);
+  if (!row||!tr) return;
+  COLS.forEach(c=>{
+    const el=tr.querySelector('[data-key="'+c.key+'"]');
+    if (el) row[c.key]=el.value;
+  });
+}
+
+function collectAll() { localRows.forEach(r=>collectRow(r.id)); }
+
+/* ── เพิ่ม/ลบแถว ── */
+function addRow() {
+  const r=blank(); localRows.push(r); renderForm();
+  setTimeout(()=>{ const el=document.querySelector('#tr-'+r.id+' input'); if(el) el.focus(); },50);
+}
+
+async function delRow(id) {
+  if (!confirm('ลบแถวนี้?')) return;
+  localRows=localRows.filter(r=>r.id!==id);
+  if (isDB && dbRef) { try { await dbRef.child(id).remove(); } catch(e){} }
+  renderForm(); updateTotals();
+}
+
+async function clearAll() {
+  if (!confirm('ล้างข้อมูลทั้งหมด?\n\n⚠ จะลบออกจากทุกเครื่อง')) return;
+  localRows=[];
+  if (isDB && dbRef) { try { await dbRef.remove(); toast('ล้างข้อมูลแล้ว'); } catch(e){} }
+  renderForm();
+}
+
+/* ════════════════ RENDER FORM ════════════════ */
+function renderForm() {
+  const tb=document.getElementById('fbody');
+  if (!localRows.length) {
+    tb.innerHTML=`<tr><td colspan="11" class="empty"><div class="empty-icon">📋</div>กด "เพิ่มแถว" เพื่อเริ่มกรอกข้อมูล</td></tr>`;
+    updateTotals(); return;
+  }
+
+  tb.innerHTML = localRows.map((row,i)=>{
+    const done = !!row.at;
+    return `
+    <tr id="tr-${row.id}" class="${done?'saved':''}">
+      <td style="vertical-align:middle;text-align:center;padding:7px 5px;">
+        <div class="row-badge ${done?'saved':''}">${i+1}</div>
+      </td>
+      ${COLS.map(c=>`
+        <td style="padding:5px 7px;vertical-align:top;">
+          ${c.type==='number'
+            ? `<input type="number" data-key="${c.key}" value="${esc(row[c.key])}"
+                placeholder="0" min="0" step="0.5"
+                oninput="onEdit('${row.id}')">`
+            : c.multi
+              ? `<textarea data-key="${c.key}" rows="2"
+                  placeholder="${c.label}"
+                  oninput="onEdit('${row.id}')">${esc(row[c.key])}</textarea>`
+              : `<input type="text" data-key="${c.key}" value="${esc(row[c.key])}"
+                  placeholder="${c.label}"
+                  oninput="onEdit('${row.id}')">`
+          }
+        </td>`).join('')}
+      <td style="vertical-align:middle;text-align:center;padding:5px 6px;">
+        <button id="sb-${row.id}"
+          class="save-row-btn ${done?'done':''}"
+          onclick="saveRow('${row.id}')">
+          ${done?'✓ บันทึก':'💾 บันทึก'}
+        </button>
+      </td>
+      <td style="vertical-align:middle;text-align:center;padding:5px 3px;">
+        <button class="del-btn" onclick="delRow('${row.id}')">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  updateTotals();
+}
+
+/* อัปเดต UI ของแถวเดียวโดยไม่ re-render ทั้งหมด */
+function updateRowUI(rowId, done) {
+  const tr  = document.getElementById('tr-'+rowId);
+  const btn = document.getElementById('sb-'+rowId);
+  const num = tr?.querySelector('.row-badge');
+  if (!tr) return;
+  if (done) {
+    tr.classList.add('saved');
+    if (btn) { btn.textContent='✓ บันทึก'; btn.classList.add('done'); }
+    if (num) num.classList.add('saved');
+  }
+}
+
+function onEdit(rowId) {
+  collectRow(rowId);
+  updateTotals();
+  // ถ้าเคย saved แล้วแต่มีการแก้ไข ให้รีเซ็ต saved state เพื่อแจ้งว่ายังไม่ได้บันทึกใหม่
+  const row=localRows.find(r=>r.id===rowId);
+  const btn=document.getElementById('sb-'+rowId);
+  if (row && btn && btn.classList.contains('done')) {
+    btn.textContent='💾 บันทึก'; btn.classList.remove('done');
+  }
+}
+
+function updateTotals() {
+  const allData = [...localRows, ...Object.values(saved).filter(s=>!localRows.find(l=>l.id===s.id))];
+  document.getElementById('th').textContent = fmt(sum(allData,'hours'));
+  document.getElementById('ts').textContent = fmt(sum(allData,'score'));
+}
+
+/* ════════════════ DASHBOARD ════════════════ */
+function renderDash() {
+  const all = Object.values(saved);
+  const h=sum(all,'hours'), s=sum(all,'score');
+  const teachers=[...new Set(all.map(r=>r.teacher).filter(Boolean))];
+  const subjects =[...new Set(all.map(r=>r.subject).filter(Boolean))];
+
+  document.getElementById('sc').textContent = all.length;
+  document.getElementById('sh').textContent = fmt(h);
+  document.getElementById('ss').textContent = fmt(s);
+  document.getElementById('st').textContent = teachers.length;
+  document.getElementById('sv').textContent = subjects.length;
+
+  const db=document.getElementById('dbody');
+  if (!all.length) {
+    db.innerHTML=`<tr><td colspan="9" class="empty"><div class="empty-icon">📊</div>ยังไม่มีข้อมูลที่บันทึกแล้ว</td></tr>`;
+  } else {
+    const sorted=[...all].sort((a,b)=>(a.at||0)-(b.at||0));
+    db.innerHTML=sorted.map((row,i)=>`
+      <tr>
+        <td style="text-align:center;color:var(--gray-400);font-size:12px;">${i+1}</td>
+        ${COLS.map(c=>`<td style="${c.type==='number'?'text-align:center;':''}color:${row[c.key]?'var(--gray-800)':'var(--gray-300)'}">${esc(row[c.key])||'—'}</td>`).join('')}
+      </tr>`).join('');
+  }
+
+  document.getElementById('dh').textContent = all.length ? fmt(h) : '—';
+  document.getElementById('ds').textContent = all.length ? fmt(s) : '—';
+
+  const sec=document.getElementById('subj-sec');
+  const grd=document.getElementById('subj-grid');
+  const COLORS=['#10B981','#8B5CF6','#F59E0B','#0EA5E9','#F43F5E','#06B6D4'];
+  if (subjects.length>1) {
+    sec.style.display='block';
+    grd.innerHTML=subjects.map((sub,si)=>{
+      const sr=all.filter(r=>r.subject===sub);
+      const sh=sum(sr,'hours'), ss=sum(sr,'score');
+      const st=[...new Set(sr.map(r=>r.teacher).filter(Boolean))];
+      return `<div class="subject-card" style="border-top:3px solid ${COLORS[si%COLORS.length]}">
+        <h4>${esc(sub)}</h4>
+        <p style="margin-bottom:3px">${fmt(sh)} ชม. · ${fmt(ss)} คะแนน</p>
+        <p>${sr.length} รายการ${st.length?' · '+st.join(', '):''}</p>
+      </div>`;
+    }).join('');
+  } else { sec.style.display='none'; }
+}
+
+/* ════════════════ DOWNLOAD WORD ════════════════ */
+function dlWord() {
+  const all=Object.values(saved);
+  if (!all.length) { alert('ยังไม่มีข้อมูลที่บันทึกแล้ว กรุณากดปุ่ม "บันทึก" ที่แต่ละแถวก่อนครับ'); return; }
+  const sorted=[...all].sort((a,b)=>(a.at||0)-(b.at||0));
+  const h=sum(sorted,'hours'), s=sum(sorted,'score');
+  const date=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  const td='border:1px solid #ccc;padding:5pt 8pt;vertical-align:top;line-height:1.7;font-size:13pt;';
+
+  const html=`<html xmlns:o='urn:schemas-microsoft-com:office:office'
+    xmlns:w='urn:schemas-microsoft-com:office:word'
+    xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset='utf-8'>
+<style>
+  body{font-family:'TH Sarabun New',Sarabun,sans-serif;font-size:14pt;margin:2cm 1.8cm;}
+  h1{font-size:18pt;text-align:center;color:#047857;margin-bottom:4pt;}
+  h2{font-size:14pt;text-align:center;color:#555;margin-bottom:14pt;}
+  table{border-collapse:collapse;width:100%;}
+  th{background:#D1FAE5;border:1px solid #999;padding:5pt 8pt;font-size:12pt;}
+  .tot td{background:#ECFDF5;font-weight:bold;border:1px solid #ccc;padding:5pt 8pt;}
+</style></head><body>
+<h1>โครงสร้างหน่วยการเรียนรู้บูรณาการ</h1>
+<h2>เสริมสร้างสมรรถนะความฉลาดรู้ตามแนวทางการประเมิน PISA</h2>
+<p style="text-align:right;font-size:11pt;color:#888;margin-bottom:12pt;">วันที่พิมพ์: ${date}</p>
+<table>
+  <thead><tr>
+    <th style="width:4%;text-align:center;">ที่</th>
+    ${COLS.map(c=>`<th ${c.type==='number'?'style="text-align:center;"':''}>${c.label}</th>`).join('')}
+  </tr></thead>
+  <tbody>
+    ${sorted.map((row,i)=>`<tr>
+      <td style="${td}text-align:center;">${i+1}</td>
+      ${COLS.map(c=>`<td style="${td}${c.type==='number'?'text-align:center;':''}">${esc(row[c.key])||''}</td>`).join('')}
+    </tr>`).join('')}
+  </tbody>
+  <tfoot><tr class="tot">
+    <td colspan="7" style="text-align:right;">รวมทั้งหมด</td>
+    <td style="text-align:center;">${fmt(h)}</td>
+    <td style="text-align:center;">${fmt(s)}</td>
+  </tr></tfoot>
+</table>
+<p style="margin-top:14pt;font-size:11pt;color:#888;">จำนวนรายการ: ${sorted.length} รายการ</p>
+</body></html>`;
+
+  const blob=new Blob(['\uFEFF'+html],{type:'application/msword;charset=utf-8'});
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'โครงสร้างหน่วยการเรียนรู้_PISA.doc'});
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+/* ════════════════ UI HELPERS ════════════════ */
+function switchTab(tab) {
+  document.getElementById('page-form').style.display = tab==='form' ? 'block' : 'none';
+  document.getElementById('page-dash').style.display = tab==='dash' ? 'block' : 'none';
+  document.getElementById('tab-form').classList.toggle('active', tab==='form');
+  document.getElementById('tab-dash').classList.toggle('active', tab==='dash');
+  if (tab==='dash') renderDash();
+}
+
+function setStatus(msg, state) {
+  document.getElementById('smsg').textContent = msg;
+  const d = document.getElementById('sdot');
+  d.className = 'dot';
+  if (state==='warn') d.classList.add('warn');
+  else if (state==='err') d.classList.add('err');
+}
+
+window.addEventListener('DOMContentLoaded', () => initFB());
+</script>
+</body>
+</html>
