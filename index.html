@@ -198,6 +198,21 @@ textarea{min-height:54px;line-height:1.5}
 .save-row-btn.done{background:linear-gradient(135deg,var(--gray-300),var(--gray-400));box-shadow:none}
 .del-btn{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:3px 5px;border-radius:var(--r-sm);transition:all .2s;line-height:1}
 .del-btn:hover{background:var(--rose-100);color:var(--rose-600)}
+/* ── DRAG HANDLE ── */
+.drag-handle{
+  cursor:grab;color:var(--gray-300);font-size:18px;
+  padding:3px 5px;border-radius:var(--r-sm);
+  transition:color .15s;line-height:1;user-select:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.drag-handle:hover{color:var(--teal-400)}
+.drag-handle:active{cursor:grabbing}
+tbody tr.drag-over{
+  background:var(--teal-100) !important;
+  outline:2px dashed var(--teal-400);
+  outline-offset:-2px;
+}
+tbody tr.dragging{opacity:.4}
 
 /* ══ STAT CARDS ══ */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
@@ -326,21 +341,23 @@ textarea{min-height:54px;line-height:1.5}
       <table>
         <thead>
           <tr>
-            <th style="width:40px" class="c">#</th>
-            <th style="min-width:108px">รายวิชา</th>
-            <th style="min-width:100px">ครูผู้สอน</th>
-            <th style="min-width:108px">มาตรฐาน</th>
-            <th style="min-width:112px">ตัวชี้วัด</th>
-            <th style="min-width:155px">สาระสำคัญ/ความคิดรวบยอด</th>
-            <th style="min-width:112px">เรื่อง</th>
-            <th style="width:74px"  class="c">เวลา (ชม.)</th>
-            <th style="width:86px"  class="c">น้ำหนัก (คะแนน)</th>
-            <th style="width:80px"  class="c">บันทึก</th>
-            <th style="width:32px"></th>
+            <th style="width:30px"></th>
+              <th style="width:40px" class="c">#</th>
+              <th style="min-width:108px">รายวิชา</th>
+              <th style="min-width:100px">ครูผู้สอน</th>
+              <th style="min-width:140px">ชื่อแผนการจัดการเรียนรู้</th>
+              <th style="min-width:160px">มาตรฐานการเรียนรู้/ตัวชี้วัด</th>
+              <th style="min-width:155px">สาระสำคัญ/ความคิดรวบยอด</th>
+              <th style="min-width:140px">จุดประสงค์การเรียนรู้</th>
+              <th style="min-width:120px">สมรรถนะ PISA</th>
+              <th style="width:80px" class="c">เวลา (ชั่วโมง)</th>
+              <th style="width:90px" class="c">น้ำหนักคะแนน</th>
+              <th style="width:80px" class="c">บันทึก</th>
+              <th style="width:32px"></th>
           </tr>
         </thead>
         <tbody id="fbody">
-          <tr><td colspan="11" class="empty"><div class="empty-icon">📋</div>กด "เพิ่มแถว" เพื่อเริ่มกรอกข้อมูล</td></tr>
+          <tr><td colspan="13" class="empty"><div class="empty-icon">📋</div>กด "เพิ่มแถว" เพื่อเริ่มกรอกข้อมูล</td></tr>
         </tbody>
         <tfoot>
           <tr>
@@ -376,12 +393,18 @@ textarea{min-height:54px;line-height:1.5}
         <thead>
           <tr>
             <th style="width:40px" class="c">#</th>
-            <th>รายวิชา</th><th>ครูผู้สอน</th><th>มาตรฐาน</th>
-            <th>ตัวชี้วัด</th><th>สาระสำคัญ/ความคิดรวบยอด</th><th>เรื่อง</th>
-            <th class="c">เวลา (ชม.)</th><th class="c">น้ำหนัก (คะแนน)</th>
+            <th>รายวิชา</th>
+            <th>ครูผู้สอน</th>
+            <th>ชื่อแผนการจัดการเรียนรู้</th>
+            <th>มาตรฐานการเรียนรู้/ตัวชี้วัด</th>
+            <th>สาระสำคัญ/ความคิดรวบยอด</th>
+            <th>จุดประสงค์การเรียนรู้</th>
+            <th>สมรรถนะ PISA</th>
+            <th class="c">เวลา (ชั่วโมง)</th>
+            <th class="c">น้ำหนักคะแนน</th>
           </tr>
         </thead>
-        <tbody id="dbody"><tr><td colspan="9" class="empty"><div class="empty-icon">📊</div>ยังไม่มีข้อมูล</td></tr></tbody>
+        <tbody id="dbody"><tr><td colspan="11" class="empty"><div class="empty-icon">📊</div>ยังไม่มีข้อมูล</td></tr></tbody>
         <tfoot>
           <tr>
             <td colspan="7" style="text-align:right;color:var(--gray-500);font-size:13px;">รวม</td>
@@ -416,10 +439,16 @@ textarea{min-height:54px;line-height:1.5}
         <thead>
           <tr>
             <th style="width:40px" class="c">#</th>
-            <th style="min-width:130px">โรงเรียน</th>
-            <th>รายวิชา</th><th>ครูผู้สอน</th><th>มาตรฐาน</th>
-            <th>ตัวชี้วัด</th><th>สาระสำคัญ/ความคิดรวบยอด</th><th>เรื่อง</th>
-            <th class="c">เวลา (ชม.)</th><th class="c">น้ำหนัก (คะแนน)</th>
+            <th style="min-width:120px">โรงเรียน</th>
+            <th>รายวิชา</th>
+            <th>ครูผู้สอน</th>
+            <th>ชื่อแผนการจัดการเรียนรู้</th>
+            <th>มาตรฐานการเรียนรู้/ตัวชี้วัด</th>
+            <th>สาระสำคัญ/ความคิดรวบยอด</th>
+            <th>จุดประสงค์การเรียนรู้</th>
+            <th>สมรรถนะ PISA</th>
+            <th class="c">เวลา (ชั่วโมง)</th>
+            <th class="c">น้ำหนักคะแนน</th>
           </tr>
         </thead>
         <tbody id="all-body"><tr><td colspan="10" class="empty"><div class="empty-icon">🌐</div>ยังไม่มีข้อมูล</td></tr></tbody>
@@ -460,14 +489,15 @@ const SCHOOLS = [
 ];
 
 const COLS = [
-  {key:'subject',   label:'รายวิชา',                  multi:false},
-  {key:'teacher',   label:'ครูผู้สอน',                multi:false},
-  {key:'standard',  label:'มาตรฐาน',                  multi:true},
-  {key:'indicator', label:'ตัวชี้วัด',                multi:true},
-  {key:'concept',   label:'สาระสำคัญ/ความคิดรวบยอด',  multi:true},
-  {key:'topic',     label:'เรื่อง',                   multi:false},
-  {key:'hours',     label:'เวลา',    type:'number'},
-  {key:'score',     label:'คะแนน',   type:'number'},
+  {key:'subject',   label:'รายวิชา',                        multi:false},
+  {key:'teacher',   label:'ครูผู้สอน',                     multi:false},
+  {key:'topic',     label:'ชื่อแผนการจัดการเรียนรู้',      multi:false},
+  {key:'standard',  label:'มาตรฐานการเรียนรู้/ตัวชี้วัด',  multi:true},
+  {key:'concept',   label:'สาระสำคัญ/ความคิดรวบยอด',       multi:true},
+  {key:'objective', label:'จุดประสงค์การเรียนรู้',         multi:true},
+  {key:'pisa_comp', label:'สมรรถนะ PISA',                  multi:true},
+  {key:'hours',     label:'เวลา (ชั่วโมง)', type:'number'},
+  {key:'score',     label:'น้ำหนักคะแนน',   type:'number'},
 ];
 
 /* ── Firebase Config ── */
@@ -492,7 +522,7 @@ let isDB          = false;
 let schoolListener = null;  // เก็บ listener เพื่อ detach เมื่อเปลี่ยนโรงเรียน
 
 function uid()   { return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
-function blank() { return {id:uid(),subject:'',teacher:'',standard:'',indicator:'',concept:'',topic:'',hours:'',score:'',at:null}; }
+function blank() { return {id:uid(),subject:'',teacher:'',topic:'',standard:'',concept:'',objective:'',pisa_comp:'',hours:'',score:'',at:null}; }
 function fmt(n)  { const v=parseFloat(n)||0; return v%1===0?String(v):v.toFixed(1); }
 function sum(a,k){ return a.reduce((s,r)=>s+(parseFloat(r[k])||0),0); }
 function esc(s)  { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -615,8 +645,14 @@ async function saveRow(rowId) {
       await dbRef.child(rowId).set(data);
       row.at = data.at;
       updateRowUI(rowId, true);
-      toast(`บันทึก "${row.subject||row.topic||'แถว'}" เรียบร้อย`);
+      toast(`บันทึก "${row.subject||row.teacher||row.topic||'แถว'}" เรียบร้อย`);
     } catch(e) { toast('บันทึกไม่สำเร็จ: '+e.message,'err'); }
+  } else {
+    // Fallback: บันทึก localStorage เมื่อ Firebase ยังไม่พร้อม
+    row.at = data.at;
+    updateRowUI(rowId, true);
+    try { localStorage.setItem('pisa_local_'+rowId, JSON.stringify(data)); } catch(e){}
+    toast(`บันทึกในเครื่องแล้ว "${row.subject||row.teacher||row.topic||'แถว'}" (รอ Firebase เชื่อมต่อ)`);
   }
   if (btn) { btn.textContent='💾 บันทึก'; btn.disabled=false; }
 }
@@ -651,12 +687,20 @@ async function clearAll() {
 function renderForm() {
   const tb=document.getElementById('fbody');
   if (!localRows.length) {
-    tb.innerHTML=`<tr><td colspan="11" class="empty"><div class="empty-icon">📋</div>กด "เพิ่มแถว" เพื่อเริ่มกรอกข้อมูล</td></tr>`;
+    tb.innerHTML=`<tr><td colspan="13" class="empty"><div class="empty-icon">📋</div>กด "เพิ่มแถว" เพื่อเริ่มกรอกข้อมูล</td></tr>`;
     updateTotals(); return;
   }
   tb.innerHTML=localRows.map((row,i)=>{
     const done=!!row.at;
-    return `<tr id="tr-${row.id}" class="${done?'saved':''}">
+    return `<tr id="tr-${row.id}" class="${done?'saved':''}"
+        draggable="true"
+        ondragstart="dragStart(event,'${row.id}')"
+        ondragover="dragOver(event,'${row.id}')"
+        ondragleave="dragLeave(event)"
+        ondrop="dragDrop(event,'${row.id}')"
+        ondragend="dragEnd(event)">
+      <td style="vertical-align:middle;text-align:center;padding:6px 4px;">
+        <div class="drag-handle" title="ลากเพื่อเรียงลำดับ">⠿</div></td>
       <td style="vertical-align:middle;text-align:center;padding:7px 5px;">
         <div class="row-badge ${done?'saved':''}">${i+1}</div></td>
       ${COLS.map(c=>`<td style="padding:5px 7px;vertical-align:top;">
@@ -690,6 +734,62 @@ function onEdit(rowId) {
   if (btn&&btn.classList.contains('done')) { btn.textContent='💾 บันทึก'; btn.classList.remove('done'); }
 }
 
+/* ══════════════════════════════════════════════════════
+   DRAG & DROP REORDER
+   ผู้ใช้ลากแถวขึ้น-ลงเพื่อจัดลำดับ "ใครสอนก่อน-หลัง"
+   หลังจัดลำดับแล้วกด Save ที่แถวนั้นเพื่อบันทึกลำดับขึ้น Firebase
+══════════════════════════════════════════════════════ */
+let dragSrcId = null;
+
+function dragStart(e, rowId) {
+  dragSrcId = rowId;
+  collectAllEdits();
+  e.dataTransfer.effectAllowed = 'move';
+  // หน่วงเล็กน้อยเพื่อให้เห็น drag ghost ก่อน
+  setTimeout(() => {
+    const tr = document.getElementById('tr-'+rowId);
+    if (tr) tr.classList.add('dragging');
+  }, 0);
+}
+
+function dragOver(e, rowId) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  if (rowId === dragSrcId) return;
+  document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('drag-over'));
+  const tr = document.getElementById('tr-'+rowId);
+  if (tr) tr.classList.add('drag-over');
+}
+
+function dragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function dragDrop(e, targetId) {
+  e.preventDefault();
+  if (!dragSrcId || dragSrcId === targetId) return;
+  const srcIdx = localRows.findIndex(r => r.id === dragSrcId);
+  const tgtIdx = localRows.findIndex(r => r.id === targetId);
+  if (srcIdx < 0 || tgtIdx < 0) return;
+  // สลับตำแหน่ง
+  const moved = localRows.splice(srcIdx, 1)[0];
+  localRows.splice(tgtIdx, 0, moved);
+  renderForm();
+  toast('จัดลำดับแล้ว — กด "💾 บันทึก" เพื่อบันทึกลำดับใหม่');
+}
+
+function dragEnd(e) {
+  dragSrcId = null;
+  document.querySelectorAll('tbody tr').forEach(r => {
+    r.classList.remove('dragging');
+    r.classList.remove('drag-over');
+  });
+}
+
+function collectAllEdits() {
+  localRows.forEach(r => collectRow(r.id));
+}
+
 function updateTotals() {
   const all=[...localRows,...Object.values(saved).filter(s=>!localRows.find(l=>l.id===s.id))];
   document.getElementById('th').textContent=fmt(sum(all,'hours'));
@@ -709,7 +809,7 @@ function renderDash() {
   document.getElementById('sv').textContent=subjects.length;
   const db=document.getElementById('dbody');
   if (!all.length) {
-    db.innerHTML=`<tr><td colspan="9" class="empty"><div class="empty-icon">📊</div>ยังไม่มีข้อมูลที่บันทึกแล้ว</td></tr>`;
+    db.innerHTML=`<tr><td colspan="11" class="empty"><div class="empty-icon">📊</div>ยังไม่มีข้อมูลที่บันทึกแล้ว</td></tr>`;
   } else {
     const sorted=[...all].sort((a,b)=>(a.at||0)-(b.at||0));
     db.innerHTML=sorted.map((row,i)=>`
@@ -776,7 +876,7 @@ function renderAll() {
   // Combined table (all schools)
   const allBody = document.getElementById('all-body');
   if (!totalAll.length) {
-    allBody.innerHTML=`<tr><td colspan="10" class="empty"><div class="empty-icon">🌐</div>ยังไม่มีข้อมูลจากโรงเรียนใด</td></tr>`;
+    allBody.innerHTML=`<tr><td colspan="12" class="empty"><div class="empty-icon">🌐</div>ยังไม่มีข้อมูลจากโรงเรียนใด</td></tr>`;
   } else {
     const sorted=[...totalAll].sort((a,b)=>(a.at||0)-(b.at||0));
     allBody.innerHTML = sorted.map((row,i) => `
@@ -803,22 +903,35 @@ function dlWord() {
     xmlns='http://www.w3.org/TR/REC-html40'>
 <head><meta charset='utf-8'>
 <style>
-  body{font-family:'TH Sarabun New',Sarabun,sans-serif;font-size:14pt;margin:2cm 1.8cm}
-  h1{font-size:18pt;text-align:center;color:#047857;margin-bottom:3pt}
-  h2{font-size:14pt;text-align:center;color:#555;margin-bottom:4pt}
-  h3{font-size:13pt;text-align:center;color:#059669;margin-bottom:14pt}
+  @page{size:A4 landscape;margin:1.5cm 1.8cm}
+  body{font-family:'TH Sarabun PSK',Sarabun,sans-serif;font-size:16pt;margin:0}
+  h1{font-size:20pt;text-align:center;color:#047857;margin-bottom:3pt}
+  h2{font-size:16pt;text-align:center;color:#555;margin-bottom:4pt}
+  h3{font-size:15pt;text-align:center;color:#059669;margin-bottom:14pt}
   table{border-collapse:collapse;width:100%}
-  th{background:#D1FAE5;border:1px solid #999;padding:5pt 7pt;font-size:12pt}
-  .tot td{background:#ECFDF5;font-weight:bold;border:1px solid #ccc;padding:5pt 7pt}
-</style></head><body>
+  th{background:#D1FAE5;border:1px solid #999;padding:4pt 6pt;font-size:14pt;font-family:'TH Sarabun PSK',Sarabun,sans-serif}
+  td{font-family:'TH Sarabun PSK',Sarabun,sans-serif;font-size:14pt}
+  .tot td{background:#ECFDF5;font-weight:bold;border:1px solid #ccc;padding:4pt 6pt}
+</style>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View>
+<w:Zoom>90</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
+</head><body>
 <h1>โครงสร้างหน่วยการเรียนรู้บูรณาการ</h1>
 <h2>เสริมสร้างสมรรถนะความฉลาดรู้ตามแนวทางการประเมิน PISA</h2>
 <h3>${currentSchool?.name||''}</h3>
 <p style="text-align:right;font-size:11pt;color:#888;margin-bottom:12pt">วันที่พิมพ์: ${date}</p>
 <table>
   <thead><tr>
-    <th style="width:4%;text-align:center">ที่</th>
-    ${COLS.map(c=>`<th ${c.type==='number'?'style="text-align:center"':''}>${c.label}</th>`).join('')}
+        <th style="width:4%;text-align:center;font-size:14pt">ที่</th>
+    <th style="font-size:14pt">รายวิชา</th>
+    <th style="font-size:14pt">ครูผู้สอน</th>
+    <th style="font-size:14pt">ชื่อแผนการจัดการเรียนรู้</th>
+    <th style="font-size:14pt">มาตรฐานการเรียนรู้/ตัวชี้วัด</th>
+    <th style="font-size:14pt">สาระสำคัญ/ความคิดรวบยอด</th>
+    <th style="font-size:14pt">จุดประสงค์การเรียนรู้</th>
+    <th style="font-size:14pt">สมรรถนะ PISA</th>
+    <th style="text-align:center;font-size:14pt">เวลา (ชั่วโมง)</th>
+    <th style="text-align:center;font-size:14pt">น้ำหนักคะแนน</th>
   </tr></thead>
   <tbody>
     ${sorted.map((row,i)=>`<tr>
