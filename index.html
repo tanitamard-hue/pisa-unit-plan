@@ -361,7 +361,7 @@ tbody tr.dragging{opacity:.4}
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="7" style="text-align:right;color:var(--gray-500);font-size:13px;">รวมทั้งหมด</td>
+            <td colspan="9" style="text-align:right;color:var(--gray-500);font-size:13px;">รวมทั้งหมด</td>
             <td style="text-align:center;color:var(--teal-700)" id="th">0</td>
             <td style="text-align:center;color:var(--violet-700)" id="ts">0</td>
             <td colspan="2"></td>
@@ -407,7 +407,7 @@ tbody tr.dragging{opacity:.4}
         <tbody id="dbody"><tr><td colspan="11" class="empty"><div class="empty-icon">📊</div>ยังไม่มีข้อมูล</td></tr></tbody>
         <tfoot>
           <tr>
-            <td colspan="7" style="text-align:right;color:var(--gray-500);font-size:13px;">รวม</td>
+            <td colspan="8" style="text-align:right;color:var(--gray-500);font-size:13px;">รวม</td>
             <td style="text-align:center;color:var(--teal-700)" id="dh">—</td>
             <td style="text-align:center;color:var(--violet-700)" id="ds">—</td>
           </tr>
@@ -454,7 +454,7 @@ tbody tr.dragging{opacity:.4}
         <tbody id="all-body"><tr><td colspan="10" class="empty"><div class="empty-icon">🌐</div>ยังไม่มีข้อมูล</td></tr></tbody>
         <tfoot>
           <tr>
-            <td colspan="8" style="text-align:right;color:var(--gray-500);font-size:13px;">รวมทุกโรงเรียน</td>
+            <td colspan="9" style="text-align:right;color:var(--gray-500);font-size:13px;">รวมทุกโรงเรียน</td>
             <td style="text-align:center;color:var(--teal-700)" id="all-h">—</td>
             <td style="text-align:center;color:var(--violet-700)" id="all-s">—</td>
           </tr>
@@ -916,6 +916,7 @@ function dlWord() {
 <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View>
 <w:Zoom>90</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
 </head><body>
+<div style="mso-page-orientation:landscape">
 <h1>โครงสร้างหน่วยการเรียนรู้บูรณาการ</h1>
 <h2>เสริมสร้างสมรรถนะความฉลาดรู้ตามแนวทางการประเมิน PISA</h2>
 <h3>${currentSchool?.name||''}</h3>
@@ -940,12 +941,13 @@ function dlWord() {
     </tr>`).join('')}
   </tbody>
   <tfoot><tr class="tot">
-    <td colspan="7" style="text-align:right">รวมทั้งหมด</td>
+    <td colspan="8" style="text-align:right">รวมทั้งหมด</td>
     <td style="text-align:center">${fmt(h)}</td>
     <td style="text-align:center">${fmt(s)}</td>
   </tr></tfoot>
 </table>
 <p style="margin-top:14pt;font-size:11pt;color:#888">จำนวนรายการ: ${sorted.length} รายการ</p>
+</div>
 </body></html>`;
   const blob=new Blob(['\uFEFF'+html],{type:'application/msword;charset=utf-8'});
   const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`โครงสร้างหน่วยการเรียนรู้_${currentSchool?.name||'PISA'}.doc`});
