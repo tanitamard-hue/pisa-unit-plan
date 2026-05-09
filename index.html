@@ -903,7 +903,6 @@ function dlWord() {
     xmlns='http://www.w3.org/TR/REC-html40'>
 <head><meta charset='utf-8'>
 <style>
-  @page{size:A4 landscape;margin:1.5cm 1.8cm}
   body{font-family:'TH Sarabun PSK',Sarabun,sans-serif;font-size:16pt;margin:0}
   h1{font-size:20pt;text-align:center;color:#047857;margin-bottom:3pt}
   h2{font-size:16pt;text-align:center;color:#555;margin-bottom:4pt}
@@ -913,17 +912,30 @@ function dlWord() {
   td{font-family:'TH Sarabun PSK',Sarabun,sans-serif;font-size:14pt}
   .tot td{background:#ECFDF5;font-weight:bold;border:1px solid #ccc;padding:4pt 6pt}
 </style>
-<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View>
-<w:Zoom>90</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
-</head><body>
-<div style="mso-page-orientation:landscape">
+<!--[if gte mso 9]><xml>
+<w:WordDocument>
+  <w:View>Print</w:View>
+  <w:Zoom>90</w:Zoom>
+  <w:DoNotOptimizeForBrowser/>
+</w:WordDocument>
+<o:OfficeDocumentSettings>
+  <o:AllowPNG/>
+</o:OfficeDocumentSettings>
+</xml><![endif]-->
+</head>
+<body>
+<!--[if gte mso 9]><xml>
+<w:sectPr>
+  <w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/>
+  <w:pgMar w:top="851" w:right="1020" w:bottom="851" w:left="1020"/>
+</w:sectPr>
+</xml><![endif]-->
 <h1>โครงสร้างหน่วยการเรียนรู้บูรณาการ</h1>
 <h2>เสริมสร้างสมรรถนะความฉลาดรู้ตามแนวทางการประเมิน PISA</h2>
 <h3>${currentSchool?.name||''}</h3>
 <p style="text-align:right;font-size:11pt;color:#888;margin-bottom:12pt">วันที่พิมพ์: ${date}</p>
 <table>
   <thead><tr>
-        <th style="width:4%;text-align:center;font-size:14pt">ที่</th>
     <th style="font-size:14pt">รายวิชา</th>
     <th style="font-size:14pt">ครูผู้สอน</th>
     <th style="font-size:14pt">ชื่อแผนการจัดการเรียนรู้</th>
@@ -935,19 +947,17 @@ function dlWord() {
     <th style="text-align:center;font-size:14pt">น้ำหนักคะแนน</th>
   </tr></thead>
   <tbody>
-    ${sorted.map((row,i)=>`<tr>
-      <td style="${td}text-align:center">${i+1}</td>
+    ${sorted.map((row)=>`<tr>
       ${COLS.map(c=>`<td style="${td}${c.type==='number'?'text-align:center':''}">${esc(row[c.key])||''}</td>`).join('')}
     </tr>`).join('')}
   </tbody>
   <tfoot><tr class="tot">
-    <td colspan="8" style="text-align:right">รวมทั้งหมด</td>
+    <td colspan="7" style="text-align:right">รวมทั้งหมด</td>
     <td style="text-align:center">${fmt(h)}</td>
     <td style="text-align:center">${fmt(s)}</td>
   </tr></tfoot>
 </table>
 <p style="margin-top:14pt;font-size:11pt;color:#888">จำนวนรายการ: ${sorted.length} รายการ</p>
-</div>
 </body></html>`;
   const blob=new Blob(['\uFEFF'+html],{type:'application/msword;charset=utf-8'});
   const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`โครงสร้างหน่วยการเรียนรู้_${currentSchool?.name||'PISA'}.doc`});
